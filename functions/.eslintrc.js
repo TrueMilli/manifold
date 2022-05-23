@@ -16,6 +16,7 @@ module.exports = {
     },
   ],
   rules: {
+    'no-extra-semi': 'off',
     'no-unused-vars': 'off',
     'no-constant-condition': ['error', { checkLoops: false }],
     'lodash/import-scope': [2, 'member'],
