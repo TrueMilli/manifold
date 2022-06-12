@@ -128,6 +128,7 @@ export function ContractPageContent(
   const isCreator = user?.id === creatorId
   const isBinary = outcomeType === 'BINARY'
   const isNumeric = outcomeType === 'NUMERIC'
+  const isFreeResponse = outcomeType === 'FREE_RESPONSE'
   const allowTrade = tradingAllowed(contract)
   const allowResolve = !isResolved && isCreator && !!user
   const hasSidePanel = (isBinary || isNumeric) && (allowTrade || allowResolve)
@@ -188,7 +189,7 @@ export function ContractPageContent(
           comments={comments ?? []}
         />
 
-        {outcomeType === 'FREE_RESPONSE' && (
+        {isFreeResponse && (
           <>
             <Spacer h={4} />
             <AnswersPanel contract={contract} />
