@@ -2,6 +2,7 @@ import { tradingAllowed } from 'web/lib/firebase/contracts'
 import { Col } from '../layout/col'
 import { Spacer } from '../layout/spacer'
 import { ContractProbGraph } from './contract-prob-graph'
+import { ContractPoolGraph } from './contract-pool-graph'
 import { useUser } from 'web/hooks/use-user'
 import { Row } from '../layout/row'
 import { Linkify } from '../linkify'
@@ -93,6 +94,7 @@ export const ContractOverview = (props: {
       {outcomeType === 'NUMERIC' && <NumericGraph contract={contract} />}
       {(contract.description || isCreator) && <Spacer h={6} />}
       {isCreator && <ShareMarket className="px-2" contract={contract} />}
+      {isBinary && <ContractPoolGraph contract={contract} bets={bets} />}{' '}
       <ContractDescription
         className="px-2"
         contract={contract}
