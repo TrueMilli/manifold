@@ -1,13 +1,16 @@
-// const weights = getCpmmLiquidityPoolWeights(contract, liquidities)
-
 import { DatumValue } from '@nivo/core'
 import { ResponsiveStream } from '@nivo/stream'
-import dayjs from 'dayjs'
 import { memo } from 'react'
 import { Bet } from 'common/bet'
 import { getInitialProbability } from 'common/calculate'
 import { CPMMContract } from 'common/contract'
 import { useWindowSize } from 'web/hooks/use-window-size'
+
+function getShares(prob: number, k: number, p: number) {
+  return (
+    (((((1 - p) / p) * prob) / (1 - prob)) * k ** (1 / p)) ** (p / (2 * p - 1))
+  )
+}
 
 export const ContractPoolGraph = memo(function ContractProbGraph(props: {
   contract: CPMMContract
@@ -15,23 +18,23 @@ export const ContractPoolGraph = memo(function ContractProbGraph(props: {
   height?: number
 }) {
   const { contract, height } = props
-  const { p } = contract
+  const { p, pool } = contract
 
+  const buckets = Array.from(Array(101).keys())
+  const distribution = Object.assign(
+    {},
+    ...buckets.map((prob) => ({ [prob]: getShares(prob, k, p) }))
+  )
+
+  const k = pool.YES ** p * pool.NO ** (1 - p)
   const bets = props.bets.filter((bet) => !bet.isAnte && !bet.isRedemption)
 
   const startProb = getInitialProbability(contract)
 
-  const times = [
-    contract.createdTime,
-    ...bets.map((bet) => bet.createdTime),
-  ].map((time) => new Date(time))
   const probs = [startProb, ...bets.map((bet) => bet.probAfter)]
 
   // Add a fake datapoint so the line continues to the right
   probs.push(probs[probs.length - 1])
-
-  const points = probs.map((prob, i) => ({ x: times[i], y: prob * 100 }))
-  const data = [{ id: 'Yes', data: points, color: '#11b981' }]
 
   const yTickValues = [0, 25, 50, 75, 100]
 
@@ -44,33 +47,20 @@ export const ContractPoolGraph = memo(function ContractProbGraph(props: {
       className="w-full overflow-visible"
       style={{ height: height ?? (!width || width >= 800 ? 350 : 250) }}
     >
-      <ResponsiveLine
-        data={data}
-        yScale={{ min: 0, max: 100, type: 'linear' }}
-        yFormat={formatPercent}
+      <ResponsiveStream
+        data={distribution}
+        keys={['all']}
         gridYValues={yTickValues}
         axisLeft={{
           tickValues: yTickValues,
           format: formatPercent,
         }}
-        xScale={{
-          type: 'time',
-          min: startDate,
-          max: latestTime.toDate(),
-        }}
-        xFormat={(d) => formatTime(+d.valueOf(), lessThanAWeek)}
         axisBottom={{
           tickValues: numXTickValues,
-          format: (time) => formatTime(+time, lessThanAWeek),
         }}
         colors={{ datum: 'color' }}
         curve="stepAfter"
-        pointSize={0}
-        pointBorderWidth={1}
-        pointBorderColor="#fff"
-        enableSlices="x"
         enableGridX={!!width && width >= 800}
-        enableArea
         margin={{ top: 20, right: 20, bottom: 25, left: 40 }}
         animate={false}
       />
@@ -80,14 +70,4 @@ export const ContractPoolGraph = memo(function ContractProbGraph(props: {
 
 function formatPercent(y: DatumValue) {
   return `${Math.round(+y.toString())}%`
-}
-
-function formatTime(time: number, includeTime: boolean) {
-  const d = dayjs(time)
-
-  if (d.isSame(Date.now(), 'day')) return d.format('ha')
-
-  if (includeTime) return dayjs(time).format('MMM D, ha')
-
-  return dayjs(time).format('MMM D')
 }

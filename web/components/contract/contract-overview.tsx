@@ -16,7 +16,7 @@ import {
 import { Bet } from 'common/bet'
 import BetRow from '../bet-row'
 import { AnswersGraph } from '../answers/answers-graph'
-import { Contract } from 'common/contract'
+import { Contract, CPMMContract } from 'common/contract'
 import { ContractDescription } from './contract-description'
 import { ContractDetails } from './contract-details'
 import { ShareMarket } from '../share-market'
@@ -94,7 +94,9 @@ export const ContractOverview = (props: {
       {outcomeType === 'NUMERIC' && <NumericGraph contract={contract} />}
       {(contract.description || isCreator) && <Spacer h={6} />}
       {isCreator && <ShareMarket className="px-2" contract={contract} />}
-      {isBinary && <ContractPoolGraph contract={contract} bets={bets} />}{' '}
+      {
+        <ContractPoolGraph contract={contract as CPMMContract} bets={bets} />
+      }{' '}
       <ContractDescription
         className="px-2"
         contract={contract}
