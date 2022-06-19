@@ -15,10 +15,11 @@ export const ContractPoolGraph = function ContractPoolGraph(props: {
   var { p, pool } = contract
   const k = pool.YES ** p + pool.NO ** (1 - p)
   const data = Array.from({length: 99}, (_, i) => ({YES:getShares((99-i)/100,k,1-p), NO:getShares((i+1)/100,k,p)}))
+  const { width } = useWindowSize()
   return (
     <div
       className="w-full overflow-visible"
-      style={{ height: height ?? (useWindowSize() ?? 0 >= 800 ? 350 : 250) }}
+      style={{ height: height ?? ((width ?? 0) >= 800 ? 350 : 250) }}
     >
       <ResponsiveStream
         data={data}
