@@ -30,7 +30,7 @@ export const ContractPoolGraph = function ContractPoolGraph(props: {
           legendOffset: 30,
         }}
         axisLeft={{
-          legend: 'pool shares traded per 1% of price change',
+          legend: 'shares that would be in the liquidity pool',
           legendOffset: -40,
         }}
         enableGridY={false}
