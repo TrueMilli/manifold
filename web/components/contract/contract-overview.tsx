@@ -95,7 +95,7 @@ export const ContractOverview = (props: {
       {(contract.description || isCreator) && <Spacer h={6} />}
       {isCreator && <ShareMarket className="px-2" contract={contract} />}
       {
-        <ContractPoolGraph contract={contract as CPMMContract} bets={bets} />
+        <ContractPoolGraph contract={contract as CPMMContract} />
       }{' '}
       <ContractDescription
         className="px-2"
