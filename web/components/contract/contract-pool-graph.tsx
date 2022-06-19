@@ -18,12 +18,11 @@ export const ContractPoolGraph = function ContractPoolGraph(props: {
     YES: getShares((99 - i) / 100, k, 1 - p),
     NO: getShares((i + 1) / 100, k, p),
   }))
-
-  const defaultHeight = (useWindowSize().height ?? 0) > 800 ? 350 : 250
+  const { width } = useWindowSize()
   return (
     <div
       className="w-full overflow-visible"
-      style={{ height: height ?? defaultHeight }}
+      style={{ height: height ?? ((width ?? 0) >= 800 ? 350 : 250) }}
     >
       <ResponsiveStream
         data={data}
