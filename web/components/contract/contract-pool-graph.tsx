@@ -4,7 +4,7 @@ import { useWindowSize } from 'web/hooks/use-window-size'
 
 function getShares(prob: number, k: number, p: number) {
   //return k * ((1-p)/p*prob/(1-prob)) ** p * p / (1-prob) / prob // no shares per %
-  return k * ((1-p)/p*prob/(1-prob)) ** p // total no shares
+  return k * ((((1 - p) / p) * prob) / (1 - prob)) ** p // total no shares
 }
 
 export const ContractPoolGraph = function ContractPoolGraph(props: {
@@ -12,17 +12,22 @@ export const ContractPoolGraph = function ContractPoolGraph(props: {
   height?: number
 }) {
   const { contract, height } = props
-  var { p, pool } = contract
+  const { p, pool } = contract
   const k = pool.YES ** p + pool.NO ** (1 - p)
-  const data = Array.from({length: 99}, (_, i) => ({YES:getShares((99-i)/100,k,1-p), NO:getShares((i+1)/100,k,p)}))
+  const data = Array.from({ length: 99 }, (_, i) => ({
+    YES: getShares((99 - i) / 100, k, 1 - p),
+    NO: getShares((i + 1) / 100, k, p),
+  }))
+
+  const defaultHeight = (useWindowSize().height ?? 0) > 800 ? 350 : 250
   return (
     <div
       className="w-full overflow-visible"
-      style={{ height: height ?? (useWindowSize() ?? 0 >= 800 ? 350 : 250) }}
+      style={{ height: height ?? defaultHeight }}
     >
       <ResponsiveStream
         data={data}
-        keys={['YES','NO']}
+        keys={['YES', 'NO']}
         margin={{ top: 50, right: 110, bottom: 50, left: 60 }}
         axisBottom={{
           tickValues: [],
@@ -35,7 +40,7 @@ export const ContractPoolGraph = function ContractPoolGraph(props: {
         }}
         enableGridY={false}
         offsetType="diverging"
-        colors={['green','red']}
+        colors={['green', 'red']}
         legends={[
           {
             anchor: 'bottom-right',
