@@ -6,6 +6,7 @@ import { Bet } from 'common/bet'
 import { getInitialProbability } from 'common/calculate'
 import { BinaryContract } from 'common/contract'
 import { useWindowSize } from 'web/hooks/use-window-size'
+import { useLiquidityData } from 'web/hooks/use-liquidity'
 
 export const ContractProbGraph = memo(function ContractProbGraph(props: {
   contract: BinaryContract
@@ -39,7 +40,11 @@ export const ContractProbGraph = memo(function ContractProbGraph(props: {
   probs.push(probs[probs.length - 1])
 
   const points = probs.map((prob, i) => ({ x: times[i], y: prob * 100 }))
-  const data = [{ id: 'Yes', data: points, color: '#11b981' }]
+  const liquidityData = useLiquidityData(contract, bets, 100)
+  const data = [
+    { id: 'Yes', data: points, color: '#11b981' },
+    { id: 'Liquidity', data: liquidityData, color: '#cccccc' },
+  ]
 
   const yTickValues = [0, 25, 50, 75, 100]
 
